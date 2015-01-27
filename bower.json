@@ -1,0 +1,25 @@
+{
+  "name": "bee-field",
+  "main": "bee-field.js",
+  "version": "0.0.1",
+  "authors": [
+    "Antonio Madonna <antonio@beemailer.com>"
+  ],
+  "description": "AngularJS directives to speed up form elements management",
+  "keywords": [
+    "angularjs",
+    "angular",
+    "directive",
+    "form",
+    "input"
+  ],
+  "license": "MIT",
+  "homepage": "http://beemailer.com",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

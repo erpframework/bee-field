@@ -1,3 +1,4 @@
+angular.module('beefield',[])
 .directive('field', function(){
     return {
         restrict:   'EA',

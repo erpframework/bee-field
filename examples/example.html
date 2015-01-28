@@ -1,0 +1,115 @@
+<html>
+    <head>
+        <script src="../bower_components/angular/angular.js"></script>
+        <script src="example.js"></script>
+        <script src="../bee-field.js"></script>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    </head>
+    <body ng-app="example" ng-controller="example">
+        <div class="container">
+
+            <h2>Field examples</h2>
+
+
+            <form novalidate name="sampleform">
+
+
+                <p>The most basic field</p>
+                <div class="well">
+                    <field model="user.first_name"></field>
+                </div>
+
+                <p>Labeled field</p>
+                <div class="well">
+                    <field model="user.last_name" label="Name"></field>
+                </div>
+
+                <p>Labeled, required field</p>
+                <div class="well">
+                    <field model="user.company" label="Company" required></field>
+                </div>
+
+                <p>Check box</p>
+                <div class="well">
+                    <field type="checkbox" label="Checkbox" model="user.admin"></field>
+                </div>
+
+                <p>HTML5 Input types: email</p>
+                <div class="well">
+                    <field type="email" model="user.email" label="Email" required></field>
+                </div>
+
+                <p>HTML5 Input types: date</p>
+                <div class="well">
+                    <field type="date" model="user.birthdate" label="Birth date" required></field>
+                </div>
+
+                <p>HTML5 Input types: number</p>
+                <div class="well">
+                    <field type="number" model="user.cost" label="Hourly rate" required></field>
+                </div>
+
+                <p>Text area</p>
+                <div class="well">
+                    <field type="textarea" model="bio" label="Biography"></field>
+                </div>
+
+                <p>Text area with rows attribute</p>
+                <div class="well">
+                    <field type="textarea" model="bio" label="Biography" rows="5"></field>
+                </div>
+
+                <p>Attributes transfer (placeholder, rows, etc). Some attributes are automatically transferred to the input element.</p>
+                <div class="well">
+                    <field type="textarea" model="bio" label="Biography" rows="5" placeholder="Placeholder"></field>
+                </div>
+
+                <p>Custom attributes</p>
+                <p>Attributes starting with tx- are automatically transferred to the child input element</p>
+                <div class="well">
+                    <field model="user.biog" label="Biography" rows="5" tx-cuccuruccu-paloma></field>
+                </div>
+
+                <p>Transcluded content</p>
+                <div class="well">
+                    <field model="cv" label="Your CV">
+                        <p class="help-block">You can inject custom content into the directive, which will be positioned after the input field</p>
+                    </field>
+                </div>
+
+                <p>Focus state</p>
+                <div class="well">
+                    <field model="cv" label="Your CV">
+                        <p ng-show="focus" class="help-block">The directive also exposes a focus property on the scope.</p>
+                    </field>
+                </div>
+
+                <p>Access to the view value (invalid input)</p>
+                <div class="well">
+                    <field model="user.required_input" label="Required input" required ng-minlength="10">
+                        <div ng-show="focus">
+                            <p class="help-block">You entered {{viewValue.length || 0}} chars of invalid value (valid above 10 chars).</p>
+                            <p>Model value: {{user.required_input}}</p>
+                            <p>View value: {{viewValue}}</p>
+                        </div>
+                    </field>
+                </div>
+
+                <p>Buttons</p>
+                <div class="well">
+                    <input submit class="btn-lg" />
+                    <input submit type="button" label="Reset" warning />
+                </div>
+
+
+            </form>
+
+            <div class="well">
+                <p>Model</p>
+                <pre>{{user|json}}</pre>
+            </div>
+
+        </div>
+    </body>
+</html>

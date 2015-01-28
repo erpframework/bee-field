@@ -1,0 +1,29 @@
+{
+  "name": "bee-field",
+  "version": "0.0.2",
+  "description": "AngularJS directives to speed up form elements management",
+  "main": "bee-field.js",
+  "directories": {
+    "example": "examples"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "jasmine-core": "^2.1.3",
+    "karma": "^0.12.31",
+    "karma-chrome-launcher": "^0.1.7",
+    "karma-jasmine": "^0.3.5"
+  },
+  "scripts": {
+    "test": "karma start test.conf.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/beemailer/bee-field.git"
+  },
+  "author": "Antonio Madonna <antonio@beemailer.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/beemailer/bee-field/issues"
+  },
+  "homepage": "https://github.com/beemailer/bee-field"
+}

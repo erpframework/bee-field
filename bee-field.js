@@ -18,6 +18,10 @@ angular.module('beefield', [])
                     '<textarea model-helper class="field" name="{{name}}" ng-model="model" ng-model-options="modelOptions"></textarea>';
                 } else if (attrs.type == 'checkbox') {
                     input = '<label><input model-helper class="field" name="{{name}}" ng-model="model" ng-model-options="modelOptions" type="checkbox" /> {{label}}</label>';
+                } else if (attrs.type == 'select') {
+                    input = '<label class="control-label" for="{{name}}">{{label}}</label>' +
+                    '<select class="form-control" name="{{name}}" ng-model="model" ng-options="{{optionsExp}}"></select>'
+
                 } else {
                     input = '<label class="control-label" for="{{name}}">{{label}}</label>' +
                     '<input model-helper class="field" name="{{name}}" ng-model="model" ng-model-options="modelOptions" type="{{type}}" />';
@@ -36,6 +40,7 @@ angular.module('beefield', [])
                 label: '@',
                 model: '=',
                 data: '=',
+                options: '='
             },
             compile: function (tEl, tAttrs, transclude) {
 
@@ -97,6 +102,8 @@ angular.module('beefield', [])
                         scope.name = attrs.model.replace(/\./g, '_');
                         scope.form = formCtrl;
                         scope.modelOptions = {updateOn: attrs.updateOn} || {};
+
+                        scope.optionsExp = attrs.optionsMode == 'single' ? 'o for o in options' : 'o.' + (attrs.optionsKey || 'id') + ' as o.' + (attrs.optionsLabel || 'name' ) + ' for o in options';
 
                         scope.validates = function () {
                             if (!scope.form) return true; // if there is no parent form tag

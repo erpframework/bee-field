@@ -5,6 +5,9 @@ function snake_case(name, separator) {
         return (pos ? separator : '') + letter.toLowerCase();
     });
 }
+function camelCase(name) {
+    return name.charAt(0).toUpperCase() + name.slice(1);
+}
 
 angular.module('beefield', [])
     .service('beefieldConfig', function() {
@@ -36,10 +39,7 @@ angular.module('beefield', [])
             }
             return '<div ng-class="{\'has-error\': !validates()}">' +
                 input +
-                '<p class="help-block" ng-if="form[name].$error.required && !validates()">{{msgs.required}}</p>' +
-                '<p class="help-block" ng-if="form[name].$error.email && !validates()">{{msgs.email}}</p>' +
-                '<p class="help-block" ng-if="form[name].$error.minlength && !validates()">{{msgs.minlength}}</p>' +
-                '<p class="help-block" ng-if="form[name].$error.maxlength && !validates()">{{msgs.maxlength}}</p>' +
+                    '<p class="help-block" ng-repeat="(error, invalid) in form[name].$error" ng-if="invalid && !validates()">{{msgs[error]}}</p>' +
                 '<transcluder class="transclude"></transcluder>' +
                 '</div>'
         }
@@ -98,12 +98,10 @@ angular.module('beefield', [])
                     scope.maxlength = attrs.ngMaxlength;
 
                     // set validation messages
-                    scope.msgs = {
-                        required: $interpolate(attrs.errorRequired || beefieldConfig.errors.required)(scope),
-                        email: $interpolate(attrs.errorEmail || beefieldConfig.errors.email)(scope),
-                        minlength:  $interpolate(attrs.errorMinlength || beefieldConfig.errors.minlength)(scope),
-                        maxlength:  $interpolate(attrs.errorMaxlength || beefieldConfig.errors.maxlength)(scope),
-                    }
+                    scope.msgs = {};
+                    angular.forEach(beefieldConfig.errors, function(msg,error) {
+                        scope.msgs[error] = $interpolate(attrs['error' + camelCase(error)] || msg)(scope);
+                    })
 
                     scope.type = attrs.type || 'text';
                     scope.name = attrs.model.replace(/\./g, '_');

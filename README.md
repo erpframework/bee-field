@@ -95,6 +95,52 @@ will output to
 </div>
 ```
 
+#### Select (basic)
+```html
+<field model="user.age" label="Age" type="select" options="ages"></field>
+```
+($scope.ages is an array of numbers)
+will output to
+
+```html
+<div class="form-group">
+    <label for="user_age" class="control-label">Age</label>
+    <select class="form-control" ng-options="o for o in options" ng-model="model">
+        <option value=""></option>
+    </select>
+</div>
+```
+
+#### Select (with object)
+```html
+<field model="user.country" label="Country" type="select" options="countries" options-mode="object"></field>
+```
+will output to
+
+```html
+<div class="form-group">
+    <label for="user_country" class="control-label">Country</label>
+    <select class="form-control" ng-options="o.id as o.name for o in options" ng-model="model">
+        <option value=""></option>
+    </select>
+</div>
+```
+
+#### Select (with object and custom key/label)
+```html
+<field model="user.country" label="Country" type="select" options="countries" options-mode="object" options-key="code" options-label="nested.name"></field>
+```
+will output to
+
+```html
+<div class="form-group">
+    <label for="user_country" class="control-label">Country</label>
+    <select class="form-control" ng-options="o.code as o.nested.name for o in options" ng-model="model">
+        <option value=""></option>
+    </select>
+</div>
+```
+
 #### Transcluded content
 ```html
 <field model="user.name" label="Your name" required>

@@ -7,34 +7,126 @@ function snake_case(name, separator) {
 }
 
 angular.module('beefield', [])
-    .directive('field', function () {
+    .service('beefieldConfig', function() {
+        return {
+            errors: {
+                required: 'Ths field is required',
+                minlength: 'This field must be at least {{minlength}} characters long',
+                maxlength: 'This field must be at maximum {{maxlength}} characters long',
+                email: 'Please enter a valid email address'
+            }
+        }
+    })
+    .directive('field', function (beefieldConfig, $interpolate) {
+
+        function template(el, attrs) {
+            var input;
+            if (attrs.type == 'textarea') {
+                input = '<label class="control-label" for="{{name}}">{{label}}</label>' +
+                '<textarea model-helper class="field" name="{{name}}" ng-model="model" ng-model-options="modelOptions"></textarea>';
+            } else if (attrs.type == 'checkbox') {
+                input = '<label><input model-helper class="field" name="{{name}}" ng-model="model" ng-model-options="modelOptions" type="checkbox" /> {{label}}</label>';
+            } else if (attrs.type == 'select') {
+                input = '<label class="control-label" for="{{name}}">{{label}}</label>' +
+                '<select class="form-control" name="{{name}}" ng-model="model" ng-options="{{optionsExp}}"></select>'
+
+            } else {
+                input = '<label class="control-label" for="{{name}}">{{label}}</label>' +
+                '<input model-helper class="field" name="{{name}}" ng-model="model" ng-model-options="modelOptions" type="{{type}}" />';
+            }
+            return '<div ng-class="{\'has-error\': !validates()}">' +
+                input +
+                '<p class="help-block" ng-if="form[name].$error.required && !validates()">{{msgs.required}}</p>' +
+                '<p class="help-block" ng-if="form[name].$error.email && !validates()">{{msgs.email}}</p>' +
+                '<p class="help-block" ng-if="form[name].$error.minlength && !validates()">{{msgs.minlength}}</p>' +
+                '<p class="help-block" ng-if="form[name].$error.maxlength && !validates()">{{msgs.maxlength}}</p>' +
+                '<transcluder class="transclude"></transcluder>' +
+                '</div>'
+        }
+
+        function compile(tEl, tAttrs, transclude) {
+
+            // transfer attributes
+            var input = angular.element(tEl.find('input')[0] || tEl.find('textarea')[0] || tEl.find('select')[0]); // get raw element to make the OR operator work
+            var attrToTransfer = [
+                'placeholder',
+                'rows',
+                'ng-disabled',
+                'ng-required',
+                'required',
+                'ng-minlength',
+                'ng-maxlength',
+                'ng-pattern',
+                'ng-change',
+                'ng-trim',
+                'force-integer',
+                'ng-options'
+            ];
+            angular.forEach(attrToTransfer, function (attr) {
+                var normalizedAttr = tAttrs.$normalize(attr);
+                input.attr(tAttrs.$attr[normalizedAttr], tAttrs[normalizedAttr] || ' ');
+            });
+
+            // transfer custom attributes
+            angular.forEach(tAttrs, function (attr, key) {
+                if (key.lastIndexOf('tx', 0) === 0) { // if starts with tx
+                    var attributeName = key.substring(2); // strip tx
+                    input.attr(snake_case(attributeName, '-'), attr);
+                }
+            })
+
+            // add bs classes
+            if (tAttrs.type == 'checkbox') {
+                tAttrs.$addClass('checkbox');
+            } else {
+                tAttrs.$addClass('form-group');
+                input.addClass('form-control');
+            }
+
+            // transfer user classes from wrapper to input
+            input.addClass(tAttrs.class);
+            tEl.removeClass(tAttrs.class)
+
+            // apply user wrapper classes
+            tAttrs.$addClass(tAttrs.wrapperClass);
+
+            return {
+                pre: function (scope, el, attrs, formCtrl, transFn) {
+
+                    // expose properties (eg. for validation)
+                    scope.minlength = attrs.ngMinlength;
+                    scope.maxlength = attrs.ngMaxlength;
+
+                    // set validation messages
+                    scope.msgs = {
+                        required: $interpolate(attrs.errorRequired || beefieldConfig.errors.required)(scope),
+                        email: $interpolate(attrs.errorEmail || beefieldConfig.errors.email)(scope),
+                        minlength:  $interpolate(attrs.errorMinlength || beefieldConfig.errors.minlength)(scope),
+                        maxlength:  $interpolate(attrs.errorMaxlength || beefieldConfig.errors.maxlength)(scope),
+                    }
+
+                    scope.type = attrs.type || 'text';
+                    scope.name = attrs.model.replace(/\./g, '_');
+                    scope.form = formCtrl;
+                    scope.modelOptions = {updateOn: attrs.updateOn} || {};
+
+                    scope.optionsExp = attrs.optionsMode !== 'object' ? 'o for o in options' : 'o.' + (attrs.optionsKey || 'id') + ' as o.' + (attrs.optionsLabel || 'name' ) + ' for o in options';
+
+                    scope.validates = function () {
+                        if (!scope.form) return true; // if there is no parent form tag
+                        var defaultRules = scope.form[scope.name].$valid || (!scope.form.$submitted && scope.form[scope.name].$pristine);
+                        return defaultRules;
+                    }
+                    el.find('transcluder').append(transFn(scope, angular.noop))
+                }
+            }
+        }
+
         return {
             restrict: 'EA',
             require: '^?form',
-            template: function (el, attrs) {
-                var input;
-                if (attrs.type == 'textarea') {
-                    input = '<label class="control-label" for="{{name}}">{{label}}</label>' +
-                    '<textarea model-helper class="field" name="{{name}}" ng-model="model" ng-model-options="modelOptions"></textarea>';
-                } else if (attrs.type == 'checkbox') {
-                    input = '<label><input model-helper class="field" name="{{name}}" ng-model="model" ng-model-options="modelOptions" type="checkbox" /> {{label}}</label>';
-                } else if (attrs.type == 'select') {
-                    input = '<label class="control-label" for="{{name}}">{{label}}</label>' +
-                    '<select class="form-control" name="{{name}}" ng-model="model" ng-options="{{optionsExp}}"></select>'
-
-                } else {
-                    input = '<label class="control-label" for="{{name}}">{{label}}</label>' +
-                    '<input model-helper class="field" name="{{name}}" ng-model="model" ng-model-options="modelOptions" type="{{type}}" />';
-                }
-                return '<div ng-class="{\'has-error\': !validates()}">' +
-                    input +
-                    '<p class="help-block" ng-if="form[name].$error.required && !validates()">{{msgs.required}}</p>' +
-                    '<p class="help-block" ng-if="form[name].$error.email && !validates()">{{msgs.email}}</p>' +
-                    '<p class="help-block" ng-if="form[name].$error.minlength && !validates()">{{msgs.minlength}}</p>' +
-                    '<p class="help-block" ng-if="form[name].$error.maxlength && !validates()">{{msgs.maxlength}}</p>' +
-                    '<transcluder class="transclude"></transcluder>' +
-                    '</div>'
-            },
+            template: template,
+            priority: 101, // to access uninterpolated attributes
             transclude: true,
             scope: {
                 label: '@',
@@ -42,79 +134,7 @@ angular.module('beefield', [])
                 data: '=',
                 options: '='
             },
-            compile: function (tEl, tAttrs, transclude) {
-
-                // transfer attributes
-                var input = angular.element(tEl.find('input')[0] || tEl.find('textarea')[0] || tEl.find('select')[0]); // get raw element to make the OR operator work
-                var attrToTransfer = [
-                    'placeholder',
-                    'rows',
-                    'ng-disabled',
-                    'ng-required',
-                    'required',
-                    'ng-minlength',
-                    'ng-maxlength',
-                    'ng-pattern',
-                    'ng-change',
-                    'ng-trim',
-                    'force-integer',
-                    'ng-options'
-                ];
-                angular.forEach(attrToTransfer, function (attr) {
-                    var normalizedAttr = tAttrs.$normalize(attr);
-                    input.attr(tAttrs.$attr[normalizedAttr], tAttrs[normalizedAttr] || ' ');
-                });
-
-                // transfer custom attributes
-                angular.forEach(tAttrs, function (attr, key) {
-                    if (key.lastIndexOf('tx', 0) === 0) { // if starts with tx
-                        var attributeName = key.substring(2); // strip tx
-                        input.attr(snake_case(attributeName, '-'), attr);
-                    }
-                })
-
-                // add bs classes
-                if (tAttrs.type == 'checkbox') {
-                    tAttrs.$addClass('checkbox');
-                } else {
-                    tAttrs.$addClass('form-group');
-                    input.addClass('form-control');
-                }
-
-                // transfer user classes from wrapper to input
-                input.addClass(tAttrs.class);
-                tEl.removeClass(tAttrs.class)
-
-                // apply user wrapper classes
-                tAttrs.$addClass(tAttrs.wrapperClass);
-
-                return {
-                    pre: function (scope, el, attrs, formCtrl, transFn) {
-
-                        scope.msgs = {
-                            required: attrs.errorRequired,
-                            email: attrs.errorEmail,
-                            minlength: attrs.errorMinlength,
-                            maxlength: attrs.errorMaxlength
-                        }
-
-                        scope.type = attrs.type || 'text';
-                        scope.name = attrs.model.replace(/\./g, '_');
-                        scope.form = formCtrl;
-                        scope.modelOptions = {updateOn: attrs.updateOn} || {};
-
-                        scope.optionsExp = attrs.optionsMode == 'single' ? 'o for o in options' : 'o.' + (attrs.optionsKey || 'id') + ' as o.' + (attrs.optionsLabel || 'name' ) + ' for o in options';
-
-                        scope.validates = function () {
-                            if (!scope.form) return true; // if there is no parent form tag
-                            var defaultRules = scope.form[scope.name].$valid || (!scope.form.$submitted && scope.form[scope.name].$pristine);
-                            return defaultRules;
-                        }
-                        el.find('transcluder').append(transFn(scope, function () {
-                        }))
-                    }
-                }
-            }
+            compile: compile
 
         }
     })

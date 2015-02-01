@@ -35,6 +35,21 @@
                     <field type="checkbox" label="Checkbox" model="user.admin"></field>
                 </div>
 
+                <p>Select</p>
+                <div class="well">
+                    <field type="select" label="Select" model="user.select" options="optionsBasic"></field>
+                </div>
+
+                <p>Select (with objects)</p>
+                <div class="well">
+                    <field type="select" label="Select" model="user.select2" options="optionsObject" options-mode="object"></field>
+                </div>
+
+                <p>Select (with objects and custom keys)</p>
+                <div class="well">
+                    <field type="select" label="Select" model="user.select2" options="optionsObjectKeys" options-mode="object" options-key="id" options-label="nested.name"></field>
+                </div>
+
                 <p>HTML5 Input types: email</p>
                 <div class="well">
                     <field type="email" model="user.email" label="Email" required></field>

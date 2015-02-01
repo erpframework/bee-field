@@ -145,7 +145,112 @@ describe('beefieldDirective', function () {
 
         var withLabel = $compile('<input submit label="Send" />')($scope);
         expect(withLabel.attr('value')).toBe('Send');
+    });
+
+    it('should create selects', function() {
+        var element = $compile('<field type="select" label="Select" model="user.select"></field>')($scope);
+        var select = element.find('select')[0];
+        expect(select).toBeTruthy();
     })
+
+    it('should create select options', function() {
+        $scope.options = ['a','b','c'];
+        var element = $compile('<field type="select" label="Select" model="user.select" options="options"></field>')($scope);
+        $scope.$digest();
+        var options = element.find('option');
+        expect(options.length).toBe(4);
+    });
+
+    it('should update select', function() {
+        $scope.options = ['a','b','c'];
+        $scope.user = {};
+        var element = $compile('<field type="select" label="Select" model="user.select" options="options"></field>')($scope);
+        var select = element.find('select');
+        $scope.$digest();
+        $scope.user.select = 'c';
+        $scope.$digest();
+        expect(select.val()).toBe('2');
+        $scope.user.select = 'b';
+        $scope.$digest();
+        expect(select.val()).toBe('1');
+    });
+
+    it('should update select model', function() {
+        $scope.options = ['a','b','c'];
+        $scope.user = {};
+        var element = $compile('<field type="select" label="Select" model="user.select" options="options"></field>')($scope);
+        var select = element.find('select');
+        $scope.$digest();
+        select.val('1');
+        select.triggerHandler('change');
+        expect($scope.user.select).toBe('b');
+    });
+
+    it('should update select (object)', function() {
+        $scope.options = [{id: 1, name: 'a'},{id: 2, name: 'b'},{id: 3, name: 'c'}];
+        $scope.user = {};
+        var element = $compile('<field type="select" label="Select" model="user.select" options="options" options-mode="object"></field>')($scope);
+        var select = element.find('select');
+        $scope.$digest();
+        $scope.user.select = 3;
+        $scope.$digest();
+        expect(select.val()).toBe('2');
+    });
+
+    it('should update select (object) model', function() {
+        $scope.options = [{id: 1, name: 'a'},{id: 2, name: 'b'},{id: 3, name: 'c'}];
+        $scope.user = {};
+        var element = $compile('<field type="select" label="Select" model="user.select" options="options" options-mode="object"></field>')($scope);
+        var select = element.find('select');
+        $scope.$digest();
+        select.val('0');
+        select.triggerHandler('change');
+        expect($scope.user.select).toBe(1);
+        select.val('2');
+        select.triggerHandler('change');
+        expect($scope.user.select).toBe(3);
+    });
+
+    it('should update select (object) model with custom key', function() {
+        $scope.options = [{code: 1, name: 'a'},{code: 2, name: 'b'},{code: 3, name: 'c'}];
+        $scope.user = {};
+        var element = $compile('<field type="select" label="Select" model="user.select" options="options" options-mode="object" options-key="code"></field>')($scope);
+        var select = element.find('select');
+        $scope.$digest();
+        select.val('0');
+        select.triggerHandler('change');
+        expect($scope.user.select).toBe(1);
+        select.val('2');
+        select.triggerHandler('change');
+        expect($scope.user.select).toBe(3);
+    });
+
+    it('should create select labels', function() {
+        $scope.options = [{id: 1, name: 'a'},{id: 2, name: 'b'},{id: 3, name: 'c'}];
+        $scope.user = {};
+        var element = $compile('<field type="select" label="Select" model="user.select" options="options" options-mode="object"></field>')($scope);
+        $scope.$digest();
+        var options = element.find('option');
+        expect(options[0].innerHTML).toBe('');
+        expect(options[1].innerHTML).toBe('a');
+        expect(options[2].innerHTML).toBe('b');
+        expect(options[3].innerHTML).toBe('c');
+        expect(options[4]).toBeUndefined();
+    });
+
+    it('should create select labels with custom label', function() {
+        $scope.options = [{id: 1, label: 'a'},{id: 2, label: 'b'},{id: 3, label: 'c'}];
+        $scope.user = {};
+        var element = $compile('<field type="select" label="Select" model="user.select" options="options" options-mode="object" options-label="label"></field>')($scope);
+        $scope.$digest();
+        var options = element.find('option');
+        expect(options[0].innerHTML).toBe('');
+        expect(options[1].innerHTML).toBe('a');
+        expect(options[2].innerHTML).toBe('b');
+        expect(options[3].innerHTML).toBe('c');
+        expect(options[4]).toBeUndefined();
+    });
+
 
 
 });

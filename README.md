@@ -187,7 +187,7 @@ Example usage:
 angular.module('myapp',['beefield'])
 .run(function(beefieldConfig){
     beefieldConfig.errors.required = 'This field is required';
-    beefieldConfig.errors.minlength: 'This field must be at least {{minlength}} characters long';
+    beefieldConfig.errors.minlength = 'This field must be at least {{minlength}} characters long';
 })
 ```
 

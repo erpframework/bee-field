@@ -251,6 +251,68 @@ describe('beefieldDirective', function () {
         expect(options[4]).toBeUndefined();
     });
 
+    it('should update form validation state', function() {
+        var element = $compile('<form name="form" novalidate><field model="user.name" required></field></form>')($scope);
+
+        $scope.user = {name: ''};
+        $scope.$digest();
+        expect($scope.form.$valid).toBeFalsy();
+        expect($scope.form.user_name.$valid).toBeFalsy();
+
+        $scope.user.name = 'Eufrate';
+        $scope.$digest();
+        expect($scope.form.$valid).toBeTruthy();
+        expect($scope.form.user_name.$valid).toBeTruthy();
+    });
+
+    it('should set error classes', function() {
+        var form = $compile('<form name="form" novalidate><field model="user.name" required></field></form>')($scope);
+        $scope.user = {};
+        $scope.form.$submitted = true;
+        $scope.$digest();
+        var wrapper = form.find('div.has-error');
+        expect(wrapper[0]).toBeDefined();
+
+        $scope.user.name = 'Kebap';
+        $scope.$digest();
+        expect(wrapper.hasClass('has-error')).toBeFalsy();
+    });
+
+    it('should display validation messages when form is invalid and submitted', function() {
+        var form = $compile('<form name="form" novalidate><field model="user.name" required></field></form>')($scope);
+        $scope.user = {};
+        $scope.form.$submitted = true;
+        $scope.$digest();
+
+        expect(form[0].innerHTML).toContain('This field is required');
+    })
+
+    it('should not display validation messages when form is valid and submitted', function() {
+        var form = $compile('<form name="form" novalidate><field model="user.name"></field></form>')($scope);
+        $scope.user = {};
+        $scope.form.$submitted = true;
+        $scope.$digest();
+
+        expect(form[0].innerHTML).not.toContain('This field is required');
+    });
+
+    it('should display custom validation messages when form is invalid and submitted', function() {
+        var form = $compile('<form name="form" novalidate><field model="user.name" error-required="Fill da field!!" required></field></form>')($scope);
+        $scope.user = {};
+        $scope.form.$submitted = true;
+        $scope.$digest();
+
+        expect(form[0].innerHTML).toContain('Fill da field!!');
+    })
+
+    it('should display interpolated custom validation messages when form is invalid and submitted', function() {
+        var form = $compile('<form name="form" novalidate><field model="user.name" error-minlength="Enter at least {{minlength}} characters" ng-minlength="10" required></field></form>')($scope);
+        $scope.user = {name: '6chars'};
+        $scope.form.$submitted = true;
+        $scope.$digest();
+
+        expect(form[0].innerHTML).toContain('Enter at least 10 characters');
+    })
 
 
 });

@@ -10,7 +10,7 @@ angular.module('beefield', [])
     .service('beefieldConfig', function() {
         return {
             errors: {
-                required: 'Ths field is required',
+                required: 'This field is required',
                 minlength: 'This field must be at least {{minlength}} characters long',
                 maxlength: 'This field must be at maximum {{maxlength}} characters long',
                 email: 'Please enter a valid email address'

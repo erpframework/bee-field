@@ -4,14 +4,15 @@ AngularJS directives to speed up form elements management.
 ### Features
 * generates div container, label and input tag
 * apply bootstrap classes
-* supports text, textarea and checkbox types
+* supports text, textarea, select and checkbox types
 * transcludes content (to the directive scope, not parent scope)
 * allows transfer of attributes from container (the <field></field> directive) to the generated input tag
-* exposes focus property on directive scope
+* exposes focus/blur properties on directive scope
 * exposes view value on directive scope (to allow access invalid input)
-* handles validation messages display (not documented - probable api change)
+* handles validation messages display
 * works in isolate scope
 * good unit test coverage
+* provides global configuration service
 
 ### Install
 
@@ -177,6 +178,19 @@ The directive exposes a viewValue property to let you access the input value eve
   <p class="help-block">{{viewValue}}</p>
 </field>
 ```
+
+### Global configuration
+The module provides a `beefieldConfig` service to globally configure directive options. At the moment the only options supported are the validation messages.
+
+Example usage:
+```javascript
+angular.module('myapp',['beefield'])
+.run(function(beefieldConfig){
+    beefieldConfig.errors.required = 'This field is required';
+    beefieldConfig.errors.minlength: 'This field must be at least {{minlength}} characters long';
+})
+```
+
 
 ---
 

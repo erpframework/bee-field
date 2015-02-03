@@ -24,22 +24,27 @@ angular.module('beefield', [])
 
         function template(el, attrs) {
             var input;
+
             if (attrs.type == 'textarea') {
                 input = '<label class="control-label" for="{{name}}">{{label}}</label>' +
                 '<textarea model-helper class="field" name="{{name}}" ng-model="model" ng-model-options="modelOptions"></textarea>';
+
             } else if (attrs.type == 'checkbox') {
                 input = '<label><input model-helper class="field" name="{{name}}" ng-model="model" ng-model-options="modelOptions" type="checkbox" /> {{label}}</label>';
+
             } else if (attrs.type == 'select') {
+                var optionsNull = (attrs.optionsNull) ? '<option value="">' + attrs.optionsNull + '</option>' : '';
                 input = '<label class="control-label" for="{{name}}">{{label}}</label>' +
-                '<select class="form-control" name="{{name}}" ng-model="model" ng-options="{{optionsExp}}"></select>'
+                '<select class="form-control" name="{{name}}" ng-model="model" ng-options="{{optionsExp}}">' + optionsNull + '</select>'
 
             } else {
                 input = '<label class="control-label" for="{{name}}">{{label}}</label>' +
                 '<input model-helper class="field" name="{{name}}" ng-model="model" ng-model-options="modelOptions" type="{{type}}" />';
             }
-            return '<div ng-class="{\'has-error\': !validates()}">' +
+
+            return  '<div ng-class="{\'has-error\': !validates()}">' +
                 input +
-                    '<p class="help-block" ng-repeat="(error, invalid) in form[name].$error" ng-if="invalid && !validates()">{{msgs[error]}}</p>' +
+                '<p class="help-block" ng-repeat="(error, invalid) in form[name].$error" ng-if="invalid && !validates()">{{msgs[error]}}</p>' +
                 '<transcluder class="transclude"></transcluder>' +
                 '</div>'
         }

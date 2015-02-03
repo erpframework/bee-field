@@ -251,6 +251,14 @@ describe('beefieldDirective', function () {
         expect(options[4]).toBeUndefined();
     });
 
+    it('should set custom select null label', function(){
+        $scope.user = {};
+        var element = $compile('<field type="select" model="user.select" options-null="Please select"></field>')($scope);
+        $scope.$digest();
+        var options = element.find('option');
+        expect(options[0].innerHTML).toBe('Please select');
+    })
+
     it('should update form validation state', function() {
         var element = $compile('<form name="form" novalidate><field model="user.name" required></field></form>')($scope);
 

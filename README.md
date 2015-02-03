@@ -142,6 +142,21 @@ will output to
 </div>
 ```
 
+#### Select (with custom null label)
+```html
+<field model="user.country" label="Country" type="select" options="countries" options-null="Please select"></field>
+```
+will output to
+
+```html
+<div class="form-group">
+    <label for="user_country" class="control-label">Country</label>
+    <select class="form-control" ng-options="o for o in options" ng-model="model">
+        <option value="">Please select</option>
+    </select>
+</div>
+```
+
 #### Transcluded content
 ```html
 <field model="user.name" label="Your name" required>
